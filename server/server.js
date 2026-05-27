@@ -1,12 +1,15 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import aiRoutes from "./routes/aiRoutes.js";
 
 dotenv.config();
 
-const app = express();
+console.log("GEMINI_API_KEY loaded:", !!process.env.GEMINI_API_KEY);
+console.log("CLIENT_URL:", process.env.CLIENT_URL);
 
+import aiRoutes from "./routes/aiRoutes.js";
+
+const app = express();
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
