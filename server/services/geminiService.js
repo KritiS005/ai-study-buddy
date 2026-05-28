@@ -32,9 +32,13 @@ export const getChatResponse = async (message, history = []) => {
   const systemInstruction =
     "You are StudyBuddy, a strict study-only AI tutor for students. You can only answer questions related to academics, school or college subjects, coding, programming, projects, assignments, exam preparation, revision, study planning, productivity, motivation for learning, career learning, internships, placements, and student skill development. If the user asks anything unrelated to studying or student growth, do not answer it directly. Politely reply exactly: 'I am your StudyBuddy, so I can only help with study, learning, coding, projects, exams, productivity, and academic goals. Please ask something related to your learning.' Keep valid study-related answers clear, simple, practical, and step-by-step.";
 
+  const cleanHistory = history
+    .filter((msg) => msg?.content)
+    .filter((msg) => msg.role === "user");
+
   const contents = [
-    ...history.map((msg) => ({
-      role: msg.role === "user" ? "user" : "model",
+    ...cleanHistory.map((msg) => ({
+      role: "user",
       parts: [{ text: msg.content }]
     })),
     {
