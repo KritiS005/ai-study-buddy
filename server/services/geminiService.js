@@ -34,25 +34,32 @@ export const getChatResponse = async (message, history = []) => {
 
   const cleanHistory = history
     .filter((msg) => msg?.content)
-    .filter((msg) => msg.role === "user");
+    .map((msg) => ({
+      role: msg.role === "user" ? "user" : "model",
+      parts: [{ text: msg.content }]
+    }));
 
   const contents = [
-    ...cleanHistory.map((msg) => ({
-      role: "user",
-      parts: [{ text: msg.content }]
-    })),
     {
       role: "user",
-      parts: [{ text: message }]
+      parts: [
+        {
+          text:
+            systemInstruction +
+            "\n\nConversation:\n" +
+            cleanHistory
+              .map((m) => m.parts[0].text)
+              .join("\n") +
+            "\n\nUser:\n" +
+            message
+        }
+      ]
     }
   ];
 
   const response = await ai.models.generateContent({
     model,
-    contents,
-    config: {
-      systemInstruction
-    }
+    contents
   });
 
   return response.text;
