@@ -14,8 +14,8 @@ import {
   Zap
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useToast } from '../context/ToastContext';
 import { aiService } from '../services/api';
+import { useToast } from '../context/ToastContext';
 
 const initialMessage = {
   role: 'assistant',
@@ -32,7 +32,11 @@ const AIStudyBuddy = () => {
 
   const [messages, setMessages] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('studybuddy_ai_messages')) || [initialMessage];
+      return (
+        JSON.parse(localStorage.getItem('studybuddy_ai_messages')) || [
+          initialMessage
+        ]
+      );
     } catch {
       return [initialMessage];
     }
@@ -46,12 +50,16 @@ const AIStudyBuddy = () => {
   const recognitionRef = useRef(null);
 
   useEffect(() => {
-    localStorage.setItem('studybuddy_ai_messages', JSON.stringify(messages));
+    localStorage.setItem(
+      'studybuddy_ai_messages',
+      JSON.stringify(messages)
+    );
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
   const sendMessage = async (customText = input) => {
     const text = customText.trim();
+
     if (!text) return;
 
     const userMessage = {
@@ -68,13 +76,13 @@ const AIStudyBuddy = () => {
     setIsTyping(true);
 
     try {
-      const response = await aiService.chat(
-        text,
-        messages.slice(-6).map((message) => ({
-          role: message.role,
-          content: message.content
-        }))
-      );
+  const response = await aiService.chat(
+    text,
+    messages.slice(-6).map((message) => ({
+      role: message.role,
+      content: message.content
+    }))
+  );
 
       setMessages((prev) => [
         ...prev,
@@ -134,7 +142,10 @@ const AIStudyBuddy = () => {
 
   const downloadChat = () => {
     const content = messages
-      .map((message) => `${message.role.toUpperCase()}: ${message.content}`)
+      .map(
+        (message) =>
+          `${message.role.toUpperCase()}: ${message.content}`
+      )
       .join('\n\n');
 
     const blob = new Blob([content], { type: 'text/plain' });
@@ -152,7 +163,10 @@ const AIStudyBuddy = () => {
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      showToast('Speech recognition is not supported in this browser.', 'error');
+      showToast(
+        'Speech recognition is not supported in this browser.',
+        'error'
+      );
       return;
     }
 
@@ -163,7 +177,6 @@ const AIStudyBuddy = () => {
     }
 
     const recognition = new SpeechRecognition();
-
     recognition.lang = 'en-IN';
     recognition.interimResults = false;
 
@@ -193,36 +206,7 @@ const AIStudyBuddy = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-160px)] space-y-4">
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-violet-600 rounded-xl shadow-lg shadow-violet-600/20">
-            <Bot className="text-white" size={20} />
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-bold">AI Study Buddy</h2>
-            <p className="text-xs text-emerald-400 font-bold uppercase tracking-widest">
-              Neural Link Active
-            </p>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <button
-            onClick={downloadChat}
-            className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-500 hover:text-white transition-all"
-          >
-            <Download size={18} />
-          </button>
-
-          <button
-            onClick={clearChat}
-            className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-500 hover:text-red-400 transition-all"
-          >
-            <Trash2 size={18} />
-          </button>
-        </div>
-      </header>
+      AI Study BuddyNeural Link Active
 
       <div className="flex-1 glass-card overflow-hidden flex flex-col relative border-white/5">
         <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 custom-scrollbar">
