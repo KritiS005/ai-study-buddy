@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { aiService } from '../services/api';
+import { aiService } from '../../services/api';
 
 const FloatingChat = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +9,7 @@ const FloatingChat = () => {
   const [chatHistory, setChatHistory] = useState([
     { role: 'assistant', content: 'Hey there! How can I help you study today? 🚀' },
   ]);
+
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef(null);
 
@@ -22,9 +23,14 @@ const FloatingChat = () => {
     if (!message.trim()) return;
 
     const currentMessage = message;
-    const userMsg = { role: 'user', content: currentMessage };
+
+    const userMsg = {
+      role: 'user',
+      content: currentMessage,
+    };
 
     setChatHistory((prev) => [...prev, userMsg]);
+
     setMessage('');
     setIsLoading(true);
 
@@ -36,15 +42,20 @@ const FloatingChat = () => {
 
       setChatHistory((prev) => [
         ...prev,
-        { role: 'assistant', content: response.data.response },
+        {
+          role: 'assistant',
+          content: response.data.response,
+        },
       ]);
     } catch (error) {
       console.error(error);
+
       setChatHistory((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: "Sorry, I'm having trouble connecting right now. Try again later!",
+          content:
+            "Sorry, I'm having trouble connecting right now. Try again later!",
         },
       ]);
     } finally {
@@ -67,9 +78,12 @@ const FloatingChat = () => {
                 <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center">
                   <MessageSquare size={16} className="text-white" />
                 </div>
+
                 <div>
                   <h4 className="text-sm font-bold">StudyBuddy AI</h4>
-                  <p className="text-[10px] text-emerald-400">Online & Ready</p>
+                  <p className="text-[10px] text-emerald-400">
+                    Online & Ready
+                  </p>
                 </div>
               </div>
 
@@ -89,7 +103,9 @@ const FloatingChat = () => {
                 <div
                   key={i}
                   className={`flex ${
-                    msg.role === 'user' ? 'justify-end' : 'justify-start'
+                    msg.role === 'user'
+                      ? 'justify-end'
+                      : 'justify-start'
                   }`}
                 >
                   <div
@@ -125,7 +141,9 @@ const FloatingChat = () => {
                   type="text"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                  onKeyDown={(e) =>
+                    e.key === 'Enter' && handleSend()
+                  }
                   placeholder="Ask anything..."
                   className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-violet-500/50"
                 />
