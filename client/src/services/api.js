@@ -1,7 +1,7 @@
 import axios from 'axios';
-// api config
+
 const api = axios.create({
-  baseURL: 'https://ai-study-buddy-tph6.onrender.com/api/',
+  baseURL: 'https://ai-study-buddy-tph6.onrender.com/api',
 });
 
 export const aiService = {
