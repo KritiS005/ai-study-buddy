@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Mic, Volume2 } from 'lucide-react';
+import { MessageSquare, X, Send, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import { aiService } from '../services/api';
 
 const FloatingChat = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,27 +14,44 @@ const FloatingChat = () => {
 
   useEffect(() => {
     if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [chatHistory]);
 
   const handleSend = async () => {
     if (!message.trim()) return;
-    
+
     const userMsg = { role: 'user', content: message };
+
     setChatHistory(prev => [...prev, userMsg]);
     setMessage('');
     setIsLoading(true);
 
     try {
-      const response = await axios.post('/api/ai/chat', { 
-        message, 
-        history: chatHistory.slice(-4) 
-      });
-      setChatHistory(prev => [...prev, { role: 'assistant', content: response.data.response }]);
+      const response = await aiService.chat(
+        message,
+        chatHistory.slice(-4)
+      );
+
+      setChatHistory(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: response.data.response
+        }
+      ]);
+
     } catch (error) {
       console.error(error);
-      setChatHistory(prev => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting right now. Try again later!" }]);
+
+      setChatHistory(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: "Sorry, I'm having trouble connecting right now. Try again later!"
+        }
+      ]);
+
     } finally {
       setIsLoading(false);
     }
@@ -55,31 +72,48 @@ const FloatingChat = () => {
                 <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center">
                   <MessageSquare size={16} className="text-white" />
                 </div>
+
                 <div>
                   <h4 className="text-sm font-bold">StudyBuddy AI</h4>
-                  <p className="text-[10px] text-emerald-400">Online & Ready</p>
+                  <p className="text-[10px] text-emerald-400">
+                    Online & Ready
+                  </p>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white">
+
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-slate-400 hover:text-white"
+              >
                 <X size={20} />
               </button>
             </div>
 
-            <div 
+            <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar"
             >
               {chatHistory.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${
-                    msg.role === 'user' 
-                      ? 'bg-violet-600 text-white rounded-tr-none shadow-lg shadow-violet-600/10' 
-                      : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none'
-                  }`}>
+                <div
+                  key={i}
+                  className={`flex ${
+                    msg.role === 'user'
+                      ? 'justify-end'
+                      : 'justify-start'
+                  }`}
+                >
+                  <div
+                    className={`max-w-[80%] p-3 rounded-2xl text-sm ${
+                      msg.role === 'user'
+                        ? 'bg-violet-600 text-white rounded-tr-none shadow-lg shadow-violet-600/10'
+                        : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none'
+                    }`}
+                  >
                     {msg.content}
                   </div>
                 </div>
               ))}
+
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="bg-white/5 border border-white/10 p-3 rounded-2xl rounded-tl-none flex gap-1">
@@ -96,15 +130,19 @@ const FloatingChat = () => {
                 <button className="p-2 rounded-xl text-slate-400 hover:text-violet-400 hover:bg-violet-400/10 transition-colors">
                   <Mic size={18} />
                 </button>
-                <input 
+
+                <input
                   type="text"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                  onKeyPress={(e) =>
+                    e.key === 'Enter' && handleSend()
+                  }
                   placeholder="Ask anything..."
                   className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-violet-500/50"
                 />
-                <button 
+
+                <button
                   onClick={handleSend}
                   className="p-2 rounded-xl bg-violet-600 text-white hover:bg-violet-500 transition-colors shadow-lg shadow-violet-600/20"
                 >
