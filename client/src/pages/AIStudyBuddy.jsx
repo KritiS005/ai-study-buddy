@@ -22,6 +22,7 @@ const AIStudyBuddy = () => {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [speakingIndex, setSpeakingIndex] = useState(null);
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
 
@@ -75,6 +76,8 @@ const AIStudyBuddy = () => {
   };
 
   const clearChat = () => {
+    window.speechSynthesis.cancel();
+    setSpeakingIndex(null);
     setMessages([initialMessage]);
     localStorage.removeItem('studybuddy_ai_messages');
     showToast('Chat cleared.', 'info');
@@ -85,18 +88,29 @@ const AIStudyBuddy = () => {
     showToast('Copied to clipboard.', 'success');
   };
 
- const speakText = (text) => {
+  const speakText = (text, index) => {
     if (!('speechSynthesis' in window)) {
       showToast('Speech is not supported in this browser.', 'error');
       return;
     }
-    if (window.speechSynthesis.speaking) {
+
+    // If same message is speaking, stop it
+    if (speakingIndex === index) {
       window.speechSynthesis.cancel();
+      setSpeakingIndex(null);
       return;
     }
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-IN';
-    window.speechSynthesis.speak(utterance);
+
+    // Stop any current speech then start new
+    window.speechSynthesis.cancel();
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-IN';
+      utterance.onend = () => setSpeakingIndex(null);
+      utterance.onerror = () => setSpeakingIndex(null);
+      window.speechSynthesis.speak(utterance);
+      setSpeakingIndex(index);
+    }, 100);
   };
 
   const downloadChat = () => {
@@ -184,8 +198,15 @@ const AIStudyBuddy = () => {
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                     {msg.role === 'assistant' && (
                       <div className="flex justify-end gap-2 mt-4">
-                        <button onClick={() => copyText(msg.content)} className="p-1.5 hover:bg-white/10 rounded-lg transition-all text-slate-500 hover:text-white"><Copy size={12} /></button>
-                        <button onClick={() => speakText(msg.content)} className="p-1.5 hover:bg-white/10 rounded-lg transition-all text-slate-500 hover:text-white"><Volume2 size={12} /></button>
+                        <button onClick={() => copyText(msg.content)} className="p-1.5 hover:bg-white/10 rounded-lg transition-all text-slate-500 hover:text-white">
+                          <Copy size={12} />
+                        </button>
+                        <button
+                          onClick={() => speakText(msg.content, index)}
+                          className={`p-1.5 hover:bg-white/10 rounded-lg transition-all ${speakingIndex === index ? 'text-violet-400' : 'text-slate-500 hover:text-white'}`}
+                        >
+                          <Volume2 size={12} />
+                        </button>
                       </div>
                     )}
                   </div>
