@@ -101,7 +101,7 @@ const AIStudyBuddy = () => {
       return;
     }
 
-    // Stop any current speech then start new
+    // Stop any current speech then start new message
     window.speechSynthesis.cancel();
     setTimeout(() => {
       const utterance = new SpeechSynthesisUtterance(text);
