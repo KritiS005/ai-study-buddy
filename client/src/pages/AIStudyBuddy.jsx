@@ -85,13 +85,18 @@ const AIStudyBuddy = () => {
     showToast('Copied to clipboard.', 'success');
   };
 
-  const speakText = (text) => {
+ const speakText = (text) => {
     if (!('speechSynthesis' in window)) {
       showToast('Speech is not supported in this browser.', 'error');
       return;
     }
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-IN';
+    window.speechSynthesis.speak(utterance);
   };
 
   const downloadChat = () => {
