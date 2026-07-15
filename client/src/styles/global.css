@@ -190,3 +190,38 @@ body::before {
 .light .bg-gradient-to-br {
   color: #ffffff;
 }
+
+/* Additive liquid treatment for every native button; it preserves dimensions and handlers. */
+button {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+button::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -55%;
+  border-radius: 45%;
+  background: radial-gradient(circle at 50% 120%, rgba(255, 255, 255, .24), transparent 46%);
+  transform: translateY(72%) scale(.82);
+  transition: transform 420ms cubic-bezier(.2, .8, .2, 1), border-radius 420ms ease;
+  pointer-events: none;
+}
+
+button:not(:disabled):is(:hover, :focus-visible)::after {
+  transform: translateY(17%) scale(1.12);
+  border-radius: 38% 62% 47% 53%;
+}
+
+button:not(:disabled):active::after {
+  transform: translateY(34%) scale(1.25);
+  transition-duration: 120ms;
+}
+
+button:focus-visible { outline: 2px solid #67e8f9; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  button::after { transition: none; }
+}

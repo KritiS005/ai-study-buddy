@@ -4,9 +4,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-console.log("GEMINI_API_KEY loaded:", !!process.env.GEMINI_API_KEY);
-console.log("CLIENT_URL:", process.env.CLIENT_URL);
-
 import aiRoutes from "./routes/aiRoutes.js";
 
 const app = express();
@@ -20,7 +17,7 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "100kb" }));
 
 app.get("/", (req, res) => {
   res.json({

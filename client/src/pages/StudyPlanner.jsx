@@ -200,11 +200,7 @@ const StudyPlanner = () => {
     };
 
     try {
-      console.log('Sending AI plan payload:', payload);
-
       const response = await aiService.generatePlan(payload);
-
-      console.log('AI plan response:', response.data);
 
       const generated =
         response?.data?.plan ||
@@ -234,8 +230,6 @@ const StudyPlanner = () => {
         error?.response?.data?.message ||
         error?.message ||
         'Unknown error';
-
-      console.log('Real AI plan error:', backendError);
 
       const slots = fallbackPlan(formData, selectedDate);
 

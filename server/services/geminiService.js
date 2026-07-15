@@ -20,7 +20,6 @@ const safeJsonParse = (text, fallback) => {
     return JSON.parse(cleaned);
   } catch (error) {
     console.error("JSON parse error:", error);
-    console.error("Raw AI response:", text);
     return fallback;
   }
 };

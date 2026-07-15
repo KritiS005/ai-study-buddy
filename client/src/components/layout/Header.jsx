@@ -6,7 +6,7 @@ import { useAppContext } from '../../context/AppContext';
 
 const Header = () => {
   const { currentUser, isDemo } = useAuth();
-  const { notifications } = useAppContext();
+  const { notifications, markAllNotificationsRead } = useAppContext();
   const [showNotifications, setShowNotifications] = useState(false);
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -55,7 +55,7 @@ const Header = () => {
                 >
                   <div className="p-4 border-b border-white/5 flex items-center justify-between">
                     <h3 className="font-bold underline">Notifications</h3>
-                    <button className="text-xs text-violet-400 hover:text-violet-300">Mark all as read</button>
+                    <button onClick={markAllNotificationsRead} className="text-xs text-violet-400 hover:text-violet-300">Mark all as read</button>
                   </div>
                   <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                     {notifications.length > 0 ? (

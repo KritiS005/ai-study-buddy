@@ -1,7 +1,17 @@
 import axios from 'axios';
+import { auth } from '../firebase/firebase';
 
 const api = axios.create({
-  baseURL: 'https://ai-study-buddy-tph6.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://ai-study-buddy-tph6.onrender.com/api',
+  timeout: 30_000,
+});
+
+api.interceptors.request.use(async (config) => {
+  const user = auth?.currentUser;
+  if (user) {
+    config.headers.Authorization = `Bearer ${await user.getIdToken()}`;
+  }
+  return config;
 });
 
 export const aiService = {

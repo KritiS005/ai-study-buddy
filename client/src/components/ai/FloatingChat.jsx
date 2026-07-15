@@ -12,6 +12,7 @@ const FloatingChat = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -61,6 +62,19 @@ const FloatingChat = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const startVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    recognitionRef.current?.stop();
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-IN';
+    recognition.interimResults = false;
+    recognition.onresult = (event) => setMessage(event.results[0][0].transcript);
+    recognitionRef.current = recognition;
+    recognition.start();
   };
 
   return (
@@ -133,7 +147,7 @@ const FloatingChat = () => {
 
             <div className="p-4 border-t border-white/5 bg-white/5">
               <div className="flex items-center gap-2">
-                <button className="p-2 rounded-xl text-slate-400 hover:text-violet-400 hover:bg-violet-400/10 transition-colors">
+                <button onClick={startVoiceInput} aria-label="Use voice input" className="p-2 rounded-xl text-slate-400 hover:text-violet-400 hover:bg-violet-400/10 transition-colors">
                   <Mic size={18} />
                 </button>
 

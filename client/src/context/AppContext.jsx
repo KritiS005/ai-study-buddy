@@ -431,6 +431,24 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const markAllNotificationsRead = async () => {
+    const unread = notifications.filter((notification) => !notification.read);
+    if (!unread.length) return;
+
+    if (isLocalMode) {
+      const updated = notifications.map((notification) => ({ ...notification, read: true }));
+      setNotifications(updated);
+      writeLocal('studybuddy_notifications', updated);
+      return;
+    }
+
+    const batch = writeBatch(db);
+    unread.forEach((notification) => {
+      batch.update(doc(db, 'users', currentUser.uid, 'notifications', notification.id), { read: true });
+    });
+    await batch.commit();
+  };
+
   const clearUserData = async () => {
     setTasks([]);
     setMoodLogs([]);
@@ -489,6 +507,7 @@ export const AppProvider = ({ children }) => {
       saveStudyPlan,
       updateStudyPlan,
       saveSettings,
+      markAllNotificationsRead,
       clearUserData
     }),
     [

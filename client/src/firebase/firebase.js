@@ -12,8 +12,6 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-console.log("Firebase Config Loaded:", firebaseConfig);
-console.log("VITE API KEY:", import.meta.env.VITE_FIREBASE_API_KEY);
 
 const isConfigured =
   Boolean(firebaseConfig.apiKey) &&
@@ -25,7 +23,6 @@ const isConfigured =
   firebaseConfig.projectId !== "YOUR_PROJECT_ID" &&
   firebaseConfig.projectId !== "your_project_id";
 
-console.log("isConfigured:", isConfigured);
 
 let app, auth, db, storage, googleProvider;
 

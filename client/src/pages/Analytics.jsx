@@ -7,7 +7,7 @@ import { useAppContext } from '../context/AppContext';
 const COLORS = ['#7C3AED', '#06B6D4', '#10B981', '#F59E0B', '#F43F5E'];
 
 const Analytics = () => {
-  const { tasks, studyPlans, moodLogs, productivityScore, totalStudyHours } = useAppContext();
+  const { tasks, studyPlans, moodLogs, productivityScore } = useAppContext();
   const [range, setRange] = useState('This Week');
 
   const studyData = useMemo(() => {
@@ -23,11 +23,12 @@ const Analytics = () => {
     });
 
     studyPlans.forEach((plan) => {
-      if (plan.status !== 'done') return;
-      const date = new Date(plan.date || Date.now());
-      const day = date.getDay();
-      const minutes = Number(String(plan.duration || '').match(/\d+/)?.[0] || 0);
-      map[day].hours += Number((minutes / 60).toFixed(1));
+      (plan.slots || []).forEach((slot) => {
+        if (slot.status !== 'done') return;
+        const date = new Date(slot.date || Date.now());
+        const minutes = Number(String(slot.duration || '').match(/\d+/)?.[0] || 0);
+        map[date.getDay()].hours += minutes / 60;
+      });
     });
 
     return map.map((item) => ({ ...item, hours: Number(item.hours.toFixed(1)) }));
@@ -39,7 +40,10 @@ const Analytics = () => {
       counts[task.subject || 'General'] = (counts[task.subject || 'General'] || 0) + 1;
     });
     studyPlans.forEach((plan) => {
-      counts[plan.subject || 'General'] = (counts[plan.subject || 'General'] || 0) + 1;
+      (plan.slots || []).forEach((slot) => {
+        const subject = slot.subject || 'General';
+        counts[subject] = (counts[subject] || 0) + 1;
+      });
     });
 
     return Object.entries(counts).map(([name, value], index) => ({
@@ -59,6 +63,11 @@ const Analytics = () => {
   const averageEnergy = moodLogs.length
     ? Math.round(moodLogs.reduce((sum, log) => sum + Number(log.energy || 0), 0) / moodLogs.length)
     : 0;
+
+  const totalStudyHours = useMemo(
+    () => studyData.reduce((total, item) => total + item.hours, 0).toFixed(1),
+    [studyData]
+  );
 
   return (
     <div className="space-y-8 pb-10">

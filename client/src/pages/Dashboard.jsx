@@ -414,7 +414,7 @@ const Dashboard = () => {
             <h3 className="text-xl font-bold mb-3">Your next best move</h3>
             <p className="text-sm text-slate-300 leading-relaxed mb-6">{aiTip}</p>
             <button
-              onClick={() => navigate('/ai-study-buddy')}
+              onClick={() => navigate('/chat')}
               className="flex items-center gap-2 text-sm font-bold text-cyan-400 hover:text-cyan-300"
             >
               Ask AI Study Buddy <ArrowRight size={16} />
